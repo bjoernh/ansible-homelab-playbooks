@@ -1,0 +1,46 @@
+---
+- name: Install neovim with NvChad on x86-64
+  hosts: test-lxc
+  tasks:
+    - name: Install Git
+      become: true
+      ansible.builtin.package:
+        state: present
+        name: git
+
+    - name: Install unzip
+      become: true
+      ansible.builtin.package:
+        name: unzip
+        state: present
+
+    - name: Download Neovim
+      ansible.builtin.get_url:
+        url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+        dest: /tmp/nvim-linux64.tar.gz
+        mode: '0644'
+
+    - name: Extract neovim to /opt/
+      become: true
+      ansible.builtin.unarchive:
+        src: /tmp/nvim-linux64.tar.gz
+        dest: /opt/
+        remote_src: true
+        creates: /opt/nvim-linux64/bin/nvim
+
+    - name: Link neovim to /usr/local/bin
+      become: true
+      ansible.builtin.file:
+        src: '/opt/nvim-linux64/bin/nvim'
+        dest: '/usr/local/bin/nvim'
+        state: link
+
+    - name: Example clone of a single branch
+      ansible.builtin.git:
+        repo: https://github.com/NvChad/starter
+        dest: ~/.config/nvim
+        version: main
+
+    - name: Print manual step
+      ansible.builtin.debug:
+        msg: Run nvim and :MasonInstallAll
