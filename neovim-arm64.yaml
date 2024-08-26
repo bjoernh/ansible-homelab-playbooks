@@ -1,0 +1,64 @@
+---
+- name: Install neovim with NvChad on ARM64
+  hosts: homelab
+  tasks:
+    - name: Install Git
+      become: true
+      ansible.builtin.package:
+        state: present
+        name: git
+
+    - name: Install unzip
+      become: true
+      ansible.builtin.package:
+        name: unzip
+        state: present
+
+    - name: Install built-essentials
+      become: true
+      ansible.builtin.package:
+        name: build-essential
+        state: present
+
+    - name: Install gettext
+      become: true
+      ansible.builtin.package:
+        name: gettext
+        state: present
+
+    - name: Install cmake
+      become: true
+      ansible.builtin.package:
+        name: cmake
+        state: present
+
+    - name: Create temporary build directory
+      ansible.builtin.tempfile:
+        state: directory
+        path: /tmp
+        suffix: neovim
+
+    - name: Clone Neovim
+      ansible.builtin.git:
+        repo: https://github.com/neovim/neovim
+        dest: /tmp/neovim
+        single_branch: true
+        version: stable
+
+    - name: Build and install nvim to /usr/local/bin
+      become: true
+      ansible.builtin.command:
+        cmd: "make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=/usr/local/ install"
+        chdir: /tmp/neovim
+      args:
+        creates: /usr/local/bin/nvim
+
+    - name: Example clone of a single branch
+      ansible.builtin.git:
+        repo: https://github.com/NvChad/starter
+        dest: ~/.config/nvim
+        version: main
+
+    - name: Print manual step
+      ansible.builtin.debug:
+        msg: Run nvim and :MasonInstallAll

@@ -1,0 +1,6 @@
+- name: My first task
+  hosts: localhost
+
+  tasks: 
+    - name: Create file on Desktop
+      command: touch ~/Desktop/test.txt

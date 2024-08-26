@@ -1,0 +1,93 @@
+---
+- name: Install ZSH, Rust Toolchain and popular commandline tools written in Rust
+  hosts: test-lxc
+  tasks:
+    - name: Install Git
+      become: true
+      ansible.builtin.package:
+        state: present
+        name: git
+    - name: Install ZSH
+      become: true
+      ansible.builtin.package:
+        name: zsh
+        state: present
+    - name: Install g++
+      become: true
+      ansible.builtin.package:
+        state: present
+        name: g++
+    - name: Install ripgrep
+      become: true
+      ansible.builtin.package:
+        state: present
+        name: ripgrep
+    - name: Link cargo to /usr/local/bin
+      become: true
+      ansible.builtin.file:
+        src: '~/.cargo/bin/cargo'
+        dest: '/usr/local/bin/cargo'
+        state: link
+
+    - name: Install "cargo binstall" Rust package
+      community.general.cargo:
+        name: cargo-binstall
+
+    - name: Install bottom
+      ansible.builtin.command:
+        cmd: cargo binstall -y bottom
+        creates: ~/.cargo/bin/btm
+
+    - name: Install difftastic
+      ansible.builtin.command:
+        cmd: cargo binstall -y difftastic
+        creates: ~/.cargo/bin/difft
+
+    - name: Install eza
+      ansible.builtin.command:
+        cmd: cargo binstall -y eza
+        creates: ~/.cargo/bin/eza
+
+    # - name: Install netop # not working at this moment HTTP 402
+    #  ansible.builtin.command: cargo install netop
+
+    - name: Install sd
+      ansible.builtin.command:
+        cmd: cargo binstall -y sd
+        creates: ~/.cargo/bin/sd
+
+    - name: Install xh
+      ansible.builtin.command:
+        cmd: cargo binstall -y xh
+        creates: ~/.cargo/bin/xh
+
+    - name: Install xcp
+      ansible.builtin.command:
+        cmd: cargo binstall -y xcp
+        creates: ~/.cargo/bin/xcp
+
+    - name: Install procs
+      ansible.builtin.command:
+        cmd: cargo binstall -y procs
+        creates: ~/.cargo/bin/procs
+
+    - name: Install bat
+      ansible.builtin.command:
+        cmd: cargo binstall -y bat
+        creates: ~/.cargo/bin/bat
+
+    - name: Install navi
+      ansible.builtin.command:
+        cmd: cargo binstall -y navi
+        creates: ~/.cargo/bin/navi
+
+    - name: Install dust
+      ansible.builtin.command:
+        cmd: cargo binstall -y du-dust
+        creates: ~/.cargo/bin/dust
+
+    # - name: Install mcfly
+    #  ansible.builtin.command: cargo install mcfly
+
+  roles:
+    - role: hurricanehrndz.rustup
